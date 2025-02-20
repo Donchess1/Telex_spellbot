@@ -12,6 +12,20 @@ def guess_words ():
             if len(word) == 6:
                 return word
 
+TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/019524fa-e7e9-73f9-9b96-04432d261992"
+
+def send_telex_message(event_name, message, username="Scrambot"):
+    """Sends a message back to Telex"""
+    payload = {
+        "event_name": event_name,
+        "message": message,
+        "status": "success",
+        "username": username
+    }
+    requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
+
+@shared_task
+
 @shared_task
 def start_hangman_game(channel_id):
     """Starts a new Hangman game and stores the game state in Redis."""
@@ -24,34 +38,23 @@ def start_hangman_game(channel_id):
         "guessed_letters": []
     }
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)  # Store for 10 minutes
-    return {
-            "event_name": "start a game",
-            "message": f"🎮 **Hangman Started!** Word: {hidden_word} (Attempts left: 6)",
-            "status": "success",
-            "username": "Scrambot"
-        }
-
+    message= f"🎮 ** Make a guess!** Word: {hidden_word} (Attempts left: 6)"
+    
+    send_telex_message("game started", message)
+     
 @shared_task
 def guess_hangman_letter(channel_id, user, letter):
     """Processes a player's letter guess and updates the game state."""
     game_state = cache.get(f"hangman_{channel_id}")
 
     if not game_state:
-        return {
-            "event_name": "make a guess",
-            "message": "❌ No active game! Type `!hangman` to start a new one.",
-            "status": "failed",
-            "username": "Scrambot"
-        }
+        message= "❌ No active game! Type `!Start` to start a new one.",
+        send_telex_message("No game", message)
 
     if letter in game_state["guessed_letters"]:
-        return {
-            "event_name": "make a guess",
-            "message": f"⚠️ {user}, you already guessed '{letter}'! Try another letter.",
-            "status": "failed",
-            "username": "Scrambot"
-        }
-
+        message = f"⚠️ {user}, you already guessed '{letter}'! Try another letter.",
+        send_telex_message("repeated guess", message)
+       
     game_state["guessed_letters"].append(letter)
 
     if letter in game_state["word"]:
@@ -64,28 +67,17 @@ def guess_hangman_letter(channel_id, user, letter):
 
         if "_" not in new_hidden_word:
             cache.delete(f"hangman_{channel_id}")
-            return {
-                "event_name": "game won",
-                "message": f"🎉 {user} guessed the word **{game_state['word']}**! You win! 🎊",
-                "status": "success",
-                "username": "Scrambot"
-            }
+            message = f"🎉 {user} guessed the word **{game_state['word']}**! You win! 🎊",
+            send_telex_message("game won", message)
+            
     else:
         game_state["attempts_left"] -= 1
         if game_state["attempts_left"] == 0:
             cache.delete(f"hangman_{channel_id}")
-            return {
-                "event_name": "game over",
-                "message": f"💀 Game over! The correct word was **{game_state['word']}**.",
-                "status": "failed",
-                "username": "Scrambot"
-            }
+            message = f"💀 Game over! The correct word was **{game_state['word']}**.",
+            send_telex_message("game over", message)
 
-    cache.set(f"hangman_{channel_id}", game_state, timeout=600)
+    #cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     
-    return {
-        "event_name": "make a guess",
-        "message": f"{user} guessed '{letter}'. Word: {game_state['hidden_word']} (Attempts left: {game_state['attempts_left']})",
-        "status": "success",
-        "username": "Scrambot"
-    }
+    message = f"{user} guessed '{letter}'. Word: {game_state['hidden_word']} (Attempts left: {game_state['attempts_left']})",
+    send_telex_message("guess attempt", message)
