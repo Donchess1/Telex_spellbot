@@ -23,12 +23,23 @@
     "settings": [
       {
         "label": "Start game",
-        "type": "number",
+        "type": "AlphaNumeric",
         "required": true,
-        "default": "1"
+        "default": "!start"
+      },
+      {
+        "label": "End game",
+        "type": "AlphaNumeric",
+        "required": false,
+        "default": "!end"
+      },
+      {
+        "label": "Guess input",
+        "type": "alphabet",
+        "required": true,
+        "default": " "
       }
     ],
-    "target_url": "tj8wjxzb-8000.uks1.devtunnels.ms/",
-    "tick_url": "none"
+    "target_url": "tj8wjxzb-8000.uks1.devtunnels.ms/api/hangman/"
   }
 }
