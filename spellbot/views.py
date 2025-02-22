@@ -7,7 +7,7 @@ from rest_framework.response import Response
 class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
-        data = request.json
+        data = request.data
         
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
         content_html= data.get("content", "")
