@@ -10,51 +10,51 @@ from rest_framework.decorators import api_view
 class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
-        settings = [
-            {
-                "label": "guess_input lenght",
-                "type": "number",
-                "description": "Set the maximum length for incoming guess",
-                "default": 1,
-                "required": True
-                },
-            {
-                "label": "activation input lenght",
-                "type": "number",
-                "description": "Set the maximum length for start word",
-                "default": 6,
-                "required": True
-                },
-                {
-                "label": "authentication",
-                "type": "AlphaNumeric",
-                "description": "means of authentication",
-                "default": "",
-                "required": True
-                }
-                ]
         data = request.data
+        # settings = [
+        #     {
+        #         "label": "guess_input lenght",
+        #         "type": "number",
+        #         "description": "Set the maximum length for incoming guess",
+        #         "default": 1,
+        #         "required": True
+        #         },
+        #     {
+        #         "label": "activation input lenght",
+        #         "type": "number",
+        #         "description": "Set the maximum length for start word",
+        #         "default": 6,
+        #         "required": True
+        #         },
+        #         {
+        #         "label": "authentication",
+        #         "type": "AlphaNumeric",
+        #         "description": "means of authentication",
+        #         "default": "",
+        #         "required": True
+        #         }
+        #         ]
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
-        message = data.get("message")
+        message = data.get("message", "")
         
         if message == "!start":
-            response = start_hangman_game(channel_id)
-            print(message)
-            return Response({
+            mine = start_hangman_game(channel_id)
+            response = {
                 "event_name": "game status",
-                "message": response,
-                "settings": settings,
+                "message": mine,
                 "status": "success",
-                "username": "spellbot"})
+                "username": "spellbot"}
+            return Response(response, status=status.HTTP_200_OK)
 
         elif len(message) == 1 and message.isalpha():
             """If a single letter is sent, process it as a guess."""
             response = guess_hangman_letter(channel_id)
-            return JsonResponse({
-                "event_name": "game status",
-                "message": response,
-                "status": "success",
-                "username": "spellbot"})
+            # JsonResponse({
+            #     "event_name": "game status",
+            #     "message": response,
+            #     "status": "success",
+            #     "username": "spellbot"})
+            return response
         return JsonResponse({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
