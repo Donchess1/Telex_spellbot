@@ -44,17 +44,18 @@ class HangmanGameView(APIView):
                 "message": mine,
                 "status": "success",
                 "username": "spellbot"}
+            print(mine)
             return Response(response, status=status.HTTP_200_OK)
 
         elif len(message) == 1 and message.isalpha():
             """If a single letter is sent, process it as a guess."""
-            response = guess_hangman_letter(channel_id)
-            # JsonResponse({
-            #     "event_name": "game status",
-            #     "message": response,
-            #     "status": "success",
-            #     "username": "spellbot"})
-            return response
+            guess = guess_hangman_letter(channel_id)
+            response = {
+                "event_name": "game status",
+                "message": guess,
+                "status": "success",
+                "username": "spellbot"}
+            return Response(response, status=status.HTTP_200_OK)
         return JsonResponse({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
