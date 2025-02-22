@@ -16,7 +16,7 @@ class HangmanGameView(APIView):
         soup = BeautifulSoup(content_html, "html.parser")
         message = soup.get_text().strip()
         settings = []
-        print(message)
+        print (f"I am {message}")
         
         if message == "!start":
             start = start_hangman_game(channel_id)
