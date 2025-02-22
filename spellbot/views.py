@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from rest_framework.views import APIView
 from rest_framework import status
 from .tasks import start_hangman_game, guess_hangman_letter
@@ -9,7 +10,9 @@ class HangmanGameView(APIView):
         data = request.json
         
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
-        message = data.get("message", "")
+        content_html= data.get("content", "")
+        soup = BeautifulSoup(content_html, "html.parser")
+        message = soup.get_text().strip()
         settings = []
         print(message)
         
