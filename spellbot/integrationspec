@@ -1,0 +1,46 @@
+{
+  "data": {
+    "date": {
+      "created_at": "2025-02-20",
+      "updated_at": "2025-02-20"
+    },
+    "descriptions": {
+      "app_name": "spellbot",
+      "app_description": "Guess game",
+      "app_logo": "https://www.freepik.com/free-photo/top-view-alphabet-text-with-scrabble-letters-black-backdrop_4333897.htm#fromView=search&page=1&position=33&uuid=e07cee45-6de7-4b18-86f7-b6b1525c1aba&query=alphabet+tile",
+      "app_url": "tj8wjxzb-8000.uks1.devtunnels.ms/api/hangman",
+      "background_color": "#fff"
+    },
+    "is_active": true,
+    "integration_type": "modifier",
+    "integration_category": "Email & Messaging",
+    "key_features": [
+      "user input",
+      "bot input",
+      ""
+    ],
+    "author": "Donchess",
+    "settings": [
+      {
+        "label": "Start game",
+        "type": "AlphaNumeric",
+        "required": true,
+        "default": "!start"
+      },
+      {
+        "label": "End game",
+        "type": "AlphaNumeric",
+        "required": false,
+        "default": "!end"
+      },
+      {
+        "label": "Guess input",
+        "type": "alphabet",
+        "required": true,
+        "default": " "
+      }
+    ],
+    "target_url": "tj8wjxzb-8000.uks1.devtunnels.ms/api/hangman/",
+    "webhook_url": "https://ping.telex.im/v1/webhooks/019524fa-e7e9-73f9-9b96-04432d261992"
+  }
+}

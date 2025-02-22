@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from .tasks import start_hangman_game, guess_hangman_letter
-
+from rest_framework.response import Response
 import json
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -10,23 +10,46 @@ from rest_framework.decorators import api_view
 class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
+        settings = [
+            {
+                "label": "guess_input lenght",
+                "type": "number",
+                "description": "Set the maximum length for incoming guess",
+                "default": 1,
+                "required": True
+                },
+            {
+                "label": "activation input lenght",
+                "type": "number",
+                "description": "Set the maximum length for start word",
+                "default": 6,
+                "required": True
+                },
+                {
+                "label": "authentication",
+                "type": "AlphaNumeric",
+                "description": "means of authentication",
+                "default": "",
+                "required": True
+                }
+                ]
         data = request.data
-        channel_id = data.get("channel_id")
-        settings = data.get("settings", [])
-        message = data.get("message").lower()
-
+        channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
+        message = data.get("message")
+        
         if message == "!start":
             response = start_hangman_game(channel_id)
             print(message)
-            return JsonResponse({
+            return Response({
                 "event_name": "game status",
                 "message": response,
+                "settings": settings,
                 "status": "success",
                 "username": "spellbot"})
 
         elif len(message) == 1 and message.isalpha():
             """If a single letter is sent, process it as a guess."""
-            response = guess_hangman_letter(channel_id, message)
+            response = guess_hangman_letter(channel_id)
             return JsonResponse({
                 "event_name": "game status",
                 "message": response,
