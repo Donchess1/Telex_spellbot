@@ -9,7 +9,7 @@ class HangmanGameView(APIView):
         data = request.data
         
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
-        message = data.get("message", "")
+        message = data.get("message")
         settings = []
         
         if message == "!start":
