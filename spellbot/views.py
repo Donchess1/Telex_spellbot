@@ -23,6 +23,14 @@ class HangmanGameView(APIView):
                     "status": "success",
                     "username": "spellbot"}
                 return Response(response, status=status.HTTP_200_OK)
+            if input == "!exit":
+                end = end_hangman_game(channel_id)
+                response = {
+                    "event_name": "game status",
+                    "message": end,
+                    "status": "success",
+                    "username": "spellbot"}
+                return Response(response, status=status.HTTP_200_OK)
 
         elif len(input) == 1 and input.isalpha():
             """If a single letter is sent, process it as a guess."""
@@ -31,15 +39,6 @@ class HangmanGameView(APIView):
                 response = {
                     "event_name": "game status",
                     "message": guess,
-                    "status": "success",
-                    "username": "spellbot"}
-                return Response(response, status=status.HTTP_200_OK)
-        elif input == "!exit":
-            end = end_hangman_game(channel_id)
-            if end.status_code == 200:
-                response = {
-                    "event_name": "game status",
-                    "message": end,
                     "status": "success",
                     "username": "spellbot"}
                 return Response(response, status=status.HTTP_200_OK)
