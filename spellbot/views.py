@@ -1,21 +1,18 @@
 from bs4 import BeautifulSoup
 from rest_framework.views import APIView
 from rest_framework import status
-from .tasks import start_hangman_game, guess_hangman_letter
+from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game
 from rest_framework.response import Response
 
 class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
         data = request.data
-        
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
-
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
         input = soup.get_text().strip()
         settings = []
-        print (f"I am {input}")
         
         if input == "!start":
             start = start_hangman_game(channel_id)
@@ -34,6 +31,15 @@ class HangmanGameView(APIView):
                 response = {
                     "event_name": "game status",
                     "message": guess,
+                    "status": "success",
+                    "username": "spellbot"}
+                return Response(response, status=status.HTTP_200_OK)
+        elif input == "!exit":
+            end = end_hangman_game(channel_id)
+            if end.status_code == 200:
+                response = {
+                    "event_name": "game status",
+                    "message": end,
                     "status": "success",
                     "username": "spellbot"}
                 return Response(response, status=status.HTTP_200_OK)
