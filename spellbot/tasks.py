@@ -20,8 +20,8 @@ def send_telex_message(event_name, message, username="Scrambot"):
         "status": "success",
         "username": username
     }
-    response = requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
-    return response
+    requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
+   # return response
 
 
 def start_hangman_game(channel_id):
@@ -36,7 +36,6 @@ def start_hangman_game(channel_id):
     }
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     message= f"🎮 ** Make a guess!** Word: {hidden_word} (Attempts left: 6)"
-    print(channel_id)
     send_telex_message("game started", message)
     return message
      

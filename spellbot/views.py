@@ -11,14 +11,13 @@ class HangmanGameView(APIView):
         
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
 
-        request_payload = data.get("Payload")
-        content_html= data.get(request_payload.content)
-        soup = BeautifulSoup(content_html, "html.parser")
-        message = soup.get_text().strip()
+        input = data.get("message", "")
+       # soup = BeautifulSoup(content_html, "html.parser")
+        #message = soup.get_text().strip()
         settings = []
-        print (f"I am {message}")
+        print (f"I am {input}")
         
-        if message == "!start":
+        if input == "!start":
             start = start_hangman_game(channel_id)
             if start.status_code == 200:
                 response = {
@@ -28,7 +27,7 @@ class HangmanGameView(APIView):
                     "username": "spellbot"}
                 return Response(response, status=status.HTTP_200_OK)
 
-        elif len(message) == 1 and message.isalpha():
+        elif len(input) == 1 and input.isalpha():
             """If a single letter is sent, process it as a guess."""
             guess = guess_hangman_letter(channel_id)
             if guess.status_code == 200:
@@ -38,5 +37,4 @@ class HangmanGameView(APIView):
                     "status": "success",
                     "username": "spellbot"}
                 return Response(response, status=status.HTTP_200_OK)
-        return Response({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)    
