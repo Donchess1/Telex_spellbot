@@ -32,7 +32,7 @@
           "default": "!end"
         }
       ],
-      "target_url": "tj8wjxzb-8000.uks1.devtunnels.ms/api/hangman/",
+      "target_url": "https://telex-spellbot.onrender.com/api/hangman/",
       "tick_url": "none"
     }
   }
