@@ -29,7 +29,7 @@ class HangmanGameView(APIView):
 
         elif len(input) == 1 and input.isalpha():
             """If a single letter is sent, process it as a guess."""
-            guess = guess_hangman_letter(channel_id)
+            guess = guess_hangman_letter(channel_id, input)
             if guess.status_code == 200:
                 response = {
                     "event_name": "game status",
