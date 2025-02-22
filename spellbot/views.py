@@ -11,9 +11,9 @@ class HangmanGameView(APIView):
         
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
 
-        input = data.get("message", "")
-       # soup = BeautifulSoup(content_html, "html.parser")
-        #message = soup.get_text().strip()
+        messages = data.get("message", "")
+        soup = BeautifulSoup(messages, "html.parser")
+        input = soup.get_text().strip()
         settings = []
         print (f"I am {input}")
         
