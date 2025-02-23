@@ -32,6 +32,9 @@ class HangmanGameView(APIView):
                 "status": "success",
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
+        
+        elif not user_input.isalpha():
+            return Response({"error": "only single alphabets are allowed"}, status=status.HTTP_200_OK)
             
         elif len(user_input) == 1 and user_input.isalpha():
             """If a single letter is sent, process it as a guess."""
