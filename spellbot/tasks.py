@@ -43,10 +43,11 @@ def end_hangman_game(channel_id):
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
+        return
     message = f"😒 aborting game, How about one more?"
     send_telex_message("No game", message)
     cache.delete(f"hangman_{channel_id}")
-     
+    return
 def guess_hangman_letter(channel_id, letter):
     """Processes a player's letter guess and updates the game state."""
     game_state = cache.get(f"hangman_{channel_id}")
@@ -54,16 +55,13 @@ def guess_hangman_letter(channel_id, letter):
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
-    
-
+        return
     if letter in game_state["guessed_letters"]:
         message = f"⚠️ you already guessed '{letter}'! Try another letter."
-        send_telex_message("repeated guess", message)
-    
-       
+        send_telex_message("repeated guess", message)       
     game_state["guessed_letters"].append(letter)
+    return message
     
-
     if letter in game_state["word"]:
         # Reveal correct letters
         new_hidden_word = "".join(
