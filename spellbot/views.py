@@ -50,7 +50,8 @@ class HangmanGameView(APIView):
                 "status": "success",
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
-        elif invalid_input(channel_id)
+        elif user_input >1 or not user_input.isalpha:
+            invalid_input(channel_id)
             response = {
                 "event_name": "game status",
                 "message": user_input,
