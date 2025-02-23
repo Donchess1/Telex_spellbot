@@ -8,7 +8,7 @@ class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
         data = request.data
-        channel_id = data.user_id
+        channel_id = data.user
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
         user_input = soup.get_text().strip().lower()if messages else ""
