@@ -44,8 +44,8 @@ def end_hangman_game(channel_id):
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
     message = f"😒 aborting game, How about one more?"
+    send_telex_message("No game", message)
     cache.delete(f"hangman_{channel_id}")
-    return message
      
 def guess_hangman_letter(channel_id, letter):
     """Processes a player's letter guess and updates the game state."""
