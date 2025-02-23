@@ -41,6 +41,7 @@ def start_hangman_game(channel_id):
 
 def end_hangman_game(channel_id):
     """Ends the current Hangman game."""
+    game_state = cache.get(f"hangman_{channel_id}")
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
