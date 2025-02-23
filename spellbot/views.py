@@ -52,4 +52,11 @@ class HangmanGameView(APIView):
             return Response(response, status=status.HTTP_200_OK)
         else:
             invalid_input(channel_id)
+            response = {
+                "event_name": "game status",
+                "message": user_input,
+                "status": "failed",
+                "username": "spellbot"
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return
