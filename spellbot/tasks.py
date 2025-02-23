@@ -35,7 +35,7 @@ def start_hangman_game(channel_id):
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     message= f"🎮 ** Make a guess!** Word: {hidden_word} (Attempts left: 6)"
     send_telex_message("game started", message)
-    return message
+    return "check"
 
 def end_hangman_game(channel_id):
     """Ends the current Hangman game."""
