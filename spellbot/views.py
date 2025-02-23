@@ -55,4 +55,5 @@ class HangmanGameView(APIView):
                 "message": user_input,
                 "status": "failed",
                 "username": "spellbot"}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)    
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        return
