@@ -9,7 +9,7 @@ class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
         data = request.data
-        channel_id = str(uuid.uuid4())
+        channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
         print(f"I am {channel_id}")
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
