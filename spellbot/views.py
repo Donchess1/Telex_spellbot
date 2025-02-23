@@ -50,13 +50,4 @@ class HangmanGameView(APIView):
                 "status": "success",
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
-        elif user_input >1 or not user_input.isalpha:
-            invalid_input(channel_id)
-            response = {
-                "event_name": "game status",
-                "message": user_input,
-                "status": "failed",
-                "username": "spellbot"
-            }
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        return
+         return Response({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)    
