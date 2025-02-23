@@ -9,6 +9,7 @@ class HangmanGameView(APIView):
         """Processes Hangman game commands and letter guesses."""
         data = request.data
         channel_id = request.user
+        print(f"I am {channel_id}")
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
         user_input = soup.get_text().strip().lower()if messages else ""
@@ -50,10 +51,4 @@ class HangmanGameView(APIView):
             return Response(response, status=status.HTTP_200_OK)
         else:
             invalid_input(channel_id)
-            response = {
-                "event_name": "game status",
-                "message": user_input,
-                "status": "failed",
-                "username": "spellbot"}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return
