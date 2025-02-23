@@ -3,12 +3,13 @@ from rest_framework.views import APIView
 from rest_framework import status
 from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game, invalid_input 
 from rest_framework.response import Response
+import uuid
 
 class HangmanGameView(APIView):
     def post(self, request):
         """Processes Hangman game commands and letter guesses."""
         data = request.data
-        channel_id = request.user
+        channel_id = str(uuid.uuid4())
         print(f"I am {channel_id}")
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
