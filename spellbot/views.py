@@ -19,7 +19,7 @@ class HangmanGameView(APIView):
                 "message": "Missing channel_id",
                 "status": "fail",
                 "username": "spellbot"}
-            return Response(response, status=status.HTTP_404_BAD_REQUEST)
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         
         if user_input == "!start":
