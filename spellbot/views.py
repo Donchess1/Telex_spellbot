@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from rest_framework.views import APIView
 from rest_framework import status
-from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game
+from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game, invalid_input 
 from rest_framework.response import Response
 
 class HangmanGameView(APIView):
@@ -41,4 +41,10 @@ class HangmanGameView(APIView):
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Invalid input. Send '!start' to start a game or type a letter to guess."}, status=status.HTTP_400_BAD_REQUEST)    
+            invalid_input(channel_id)
+            response = {
+                "event_name": "game status",
+                "message": user_input,
+                "status": "failed",
+                "username": "spellbot""error":}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)    
