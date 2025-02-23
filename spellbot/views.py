@@ -52,7 +52,7 @@ class HangmanGameView(APIView):
                 "status": "success",
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
-        elif len(user_input) > 1 and != "!exit" and != "!start":
+        elif len(user_input) > 1 and user_input not in ["we", "push"]:
             response = {
                 "event_name": "game status",
                 "message": "Invalid input. Send '!start' to start a game or type a letter to guess.",
