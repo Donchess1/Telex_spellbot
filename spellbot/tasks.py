@@ -35,7 +35,7 @@ def start_hangman_game(channel_id):
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     message= f"🎮 ** Make a guess!** Word: {hidden_word} (Attempts left: 6)"
     send_telex_message("game started", message)
-    return "check"
+    return
 
 def end_hangman_game(channel_id):
     """Ends the current Hangman game."""
@@ -59,7 +59,7 @@ def guess_hangman_letter(channel_id, letter):
     if letter in game_state["guessed_letters"]:
         message = f"⚠️ you already guessed '{letter}'! Try another letter."
         send_telex_message("repeated guess", message)
-        return message
+        return
     game_state["guessed_letters"].append(letter)
    
     
@@ -75,7 +75,7 @@ def guess_hangman_letter(channel_id, letter):
             cache.delete(f"hangman_{channel_id}")
             message = f"🎉 You guessed the word correctly, **{game_state['word']}**! You win! 🎊"
             send_telex_message("game won", message)
-            return message
+            return
             
     else:
         game_state["attempts_left"] -= 1
@@ -83,10 +83,10 @@ def guess_hangman_letter(channel_id, letter):
             cache.delete(f"hangman_{channel_id}")
             message = f"💀 Game over! The correct word was **{game_state['word']}**."
             send_telex_message("game over", message)
-            return message
+            return
 
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     
     message = f"You guessed '{letter}'. Word: {game_state['hidden_word']} (Attempts left: {game_state['attempts_left']})"
     send_telex_message("guess attempt", message)
-    return message
+    return
