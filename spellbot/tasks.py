@@ -22,7 +22,7 @@ def send_telex_message(event_name, message, username="Scrambot"):
     }
     requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
 
-def start_hangman_game(channel_id):
+def start_hangman_game(user):
     """Starts a new Hangman game and stores the game state in the cache."""
     hidden_word = "_" * 6
     word = guess_words()
