@@ -54,12 +54,12 @@ def guess_hangman_letter(channel_id, letter):
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
-        return message
+    
 
     if letter in game_state["guessed_letters"]:
         message = f"⚠️ you already guessed '{letter}'! Try another letter."
         send_telex_message("repeated guess", message)
-        return message
+    
        
     game_state["guessed_letters"].append(letter)
     
