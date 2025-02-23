@@ -41,7 +41,11 @@ def start_hangman_game(channel_id):
 
 def end_hangman_game(channel_id):
     """Ends the current Hangman game."""
-    message= f"😒 aborting game, How about one more?"
+    if not game_state:
+        message= "❌ No active game! Type `!Start` to start a new one."
+        send_telex_message("No game", message)
+        return message
+    message = f"😒 aborting game, How about one more?"
     cache.delete(f"hangman_{channel_id}")
     return message
      
