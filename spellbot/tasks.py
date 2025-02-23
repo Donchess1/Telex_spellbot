@@ -21,8 +21,6 @@ def send_telex_message(event_name, message, username="Scrambot"):
         "username": username
     }
     requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
-   # return response
-
 
 def start_hangman_game(channel_id):
     """Starts a new Hangman game and stores the game state in the cache."""
