@@ -58,9 +58,10 @@ def guess_hangman_letter(channel_id, letter):
         return
     if letter in game_state["guessed_letters"]:
         message = f"⚠️ you already guessed '{letter}'! Try another letter."
-        send_telex_message("repeated guess", message)       
+        send_telex_message("repeated guess", message)
+        return message
     game_state["guessed_letters"].append(letter)
-    return message
+   
     
     if letter in game_state["word"]:
         # Reveal correct letters
