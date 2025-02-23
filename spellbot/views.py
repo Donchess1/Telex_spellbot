@@ -11,10 +11,10 @@ class HangmanGameView(APIView):
         channel_id = "019524fa-e7e9-73f9-9b96-04432d261992"
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
-        input = soup.get_text().strip().lower()
+        user_input = soup.get_text().strip().lower()
         settings = []
         
-        if input == "!start":
+        if user_input == "!start":
             start = start_hangman_game(channel_id)
             response = {
                 "event_name": "game status",
@@ -23,16 +23,16 @@ class HangmanGameView(APIView):
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
             
-        elif len(input) == 1 and input.isalpha():
+        elif len(user_input) == 1 and user_input.isalpha():
             """If a single letter is sent, process it as a guess."""
-            guess = guess_hangman_letter(channel_id, input)
+            guess = guess_hangman_letter(channel_id, user_input)
             response = {
                 "event_name": "game status",
                 "message": guess,
                 "status": "success",
                 "username": "spellbot"}
             return Response(response, status=status.HTTP_200_OK)
-        elif input == "!exit":
+        elif user_input == "!exit":
             end = end_hangman_game(channel_id)
             response = {
                 "event_name": "game status",
