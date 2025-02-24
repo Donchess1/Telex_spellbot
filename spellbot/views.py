@@ -13,7 +13,8 @@ class HangmanGameView(APIView):
         messages = data.get("message", "")
         soup = BeautifulSoup(messages, "html.parser")
         user_input = soup.get_text().strip().lower()if messages else ""
-        settings = []
+        settings = { "start game": "!start",
+                   "end game" :""}
         if not channel_id:
             response = {
                 "event_name": "channel_id status",
