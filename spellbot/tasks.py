@@ -12,7 +12,7 @@ def guess_words ():
             if len(word) == 6:
                 return word
 
-Channel_ID = os.getenv("Channel_ID", "")
+#Channel_ID = os.getenv("Channel_ID", "")
 
 WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/019524fa-e7e9-73f9-9b96-04432d261992"
 
