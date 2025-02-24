@@ -15,6 +15,7 @@ def guess_words ():
 Channel_ID = os.getenv("Channel_ID", "")
 
 WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/0195397f-d6a4-7a84-ae3e-7c7ec996ec09"
+
 def send_telex_message(event_name, message, username="Scrambot"):
     """Sends a message back to Telex"""
     payload = {
@@ -38,7 +39,7 @@ def start_hangman_game(channel_id):
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     message= f"🎮 ** Make a guess!** Word: {hidden_word} (Attempts left: 6)"
     send_telex_message("game started", message)
-    return
+    return message
 def end_hangman_game(channel_id):
     if not cache.get(f"hangman_{channel_id}"):
         message= "❌ No active game! Type `!Start` to start a new one."
@@ -49,11 +50,11 @@ def end_hangman_game(channel_id):
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
-        return
+        return message
     message = f"😒 aborting game, How about one more?"
     send_telex_message("No game", message)
     cache.delete(f"hangman_{channel_id}")
-    return
+    return message
 def guess_hangman_letter(channel_id, letter):
     """Processes a player's letter guess and updates the game state."""
     game_state = cache.get(f"hangman_{channel_id}")
@@ -61,11 +62,11 @@ def guess_hangman_letter(channel_id, letter):
     if not game_state:
         message= "❌ No active game! Type `!Start` to start a new one."
         send_telex_message("No game", message)
-        return
+        return message
     if letter in game_state["guessed_letters"]:
         message = f"⚠️ you already guessed '{letter}'! Try another letter."
         send_telex_message("repeated guess", message)
-        return
+        return message
     game_state["guessed_letters"].append(letter)
    
     
@@ -89,10 +90,10 @@ def guess_hangman_letter(channel_id, letter):
             cache.delete(f"hangman_{channel_id}")
             message = f"💀 Game over! The correct word was **{game_state['word']}**."
             send_telex_message("game over", message)
-            return
+            return message
 
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
     
     message = f"You guessed '{letter}'. Word: {game_state['hidden_word']} (Attempts left: {game_state['attempts_left']})"
     send_telex_message("guess attempt", message)
-    return
+    return message
