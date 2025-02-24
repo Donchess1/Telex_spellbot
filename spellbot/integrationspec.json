@@ -7,7 +7,7 @@
       "descriptions": {
         "app_name": "spellbot",
         "app_description": "guess game",
-        "app_logo": "https://www.freepik.com/free-photo/top-view-alphabet-text-with-scrabble-letters-black-backdrop_4333897.htm",
+        "app_logo": "https://img.icons8.com/?size=100&id=0Jv2lK6NRh0w&format=png&color=000000",
         "app_url": "https://telex-spellbot.onrender.com/api/hangman/",
         "background_color": "#fff"
       },
@@ -15,7 +15,9 @@
       "integration_type": "modifier",
       "integration_category": "Task Automation",
       "key_features": [
-        "receives guess from user\nvalidates guess\nreturn result"
+        "receives guess from user",
+        "validates guess",
+        "return result"
       ],
       "author": "Donchess",
       "settings": [
