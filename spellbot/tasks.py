@@ -10,7 +10,7 @@ def guess_words ():
             if len(word) == 6:
                 return word
 
-TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/0195350f-dbd7-7f8a-b58c-d0450984ea58"
+TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/019524fa-e7e9-73f9-9b96-04432d261992"
 
 def send_telex_message(event_name, message, username="Scrambot"):
     """Sends a message back to Telex"""
