@@ -1,3 +1,5 @@
+import os
+import requests
 from django.core.cache import cache
 import requests 
 
@@ -10,7 +12,11 @@ def guess_words ():
             if len(word) == 6:
                 return word
 
-TELEX_WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/0195350f-dbd7-7f8a-b58c-d0450984ea58"
+Channel_ID = os.getenv("Channel_ID", "")
+
+# Construct full webhook URL
+
+WEBHOOK_URL = f"https://ping.telex.im/v1/webhooks/{Channel_ID}"
 
 def send_telex_message(event_name, message, username="Scrambot"):
     """Sends a message back to Telex"""
@@ -20,7 +26,7 @@ def send_telex_message(event_name, message, username="Scrambot"):
         "status": "success",
         "username": username
     }
-    requests.post(TELEX_WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
+    requests.post(WEBHOOK_URL, json=payload, headers={"Content-Type": "application/json"})
 
 def start_hangman_game(channel_id):
     """Starts a new Hangman game and stores the game state in the cache."""
