@@ -14,7 +14,8 @@ def guess_words ():
 
 Channel_ID = os.getenv("Channel_ID", "")
 
-WEBHOOK_URL = f"https://ping.telex.im/v1/webhooks/{Channel_ID}"
+#WEBHOOK_URL = f"https://ping.telex.im/v1/webhooks/{Channel_ID}"
+WEBHOOK_URL = https://ping.telex.im/v1/webhooks/0195350f-dbd7-7f8a-b58c-d0450984ea58
 
 def send_telex_message(event_name, message, username="Scrambot"):
     """Sends a message back to Telex"""
