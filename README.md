@@ -19,5 +19,12 @@ pip install -r requirements.txt
 
 ## Installation on Telex
 log into the telex app
-Create a channel and copy the webhook. In the task.py, replace the webhook 
-Under the 
+Create a channel and copy the channel_Id.
+Create a .env file in the project file, create and paste the "Channel_ID = copied variable".
+In the telex app, add new app and enter the json url ="https://telex-spellbot.onrender.com/api/markdown/"
+Switch the app on to activate the integration
+
+## Playing the game
+start the game with "!start"
+make guesses by entering an alphabet and pressing enter
+exit the game at anytime before exhausted attempt chances with "!exit"
