@@ -19,7 +19,7 @@ SECRET_KEY = 'django-insecure-au&c074gdyquido4(3j6pe-g_q#p3*c(__s9r8^j5^g9s-c4&n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["telex-spellbot.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["telex-spellbot.onrender.com", "localhost", "127.0.0.1", "telex.im"]
 
 
 # Application definition
