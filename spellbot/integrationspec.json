@@ -34,7 +34,7 @@
           "default": "!end"
         }
       ],
-      "target_url": "https://telex.im/dashboard/channels/0195397f-d6a4-7a84-ae3e-7c7ec996ec09",
+      "target_url": "https://telex-spellbot.onrender.com/api/hangman/",
       "tick_url": "none"
     }
   }
