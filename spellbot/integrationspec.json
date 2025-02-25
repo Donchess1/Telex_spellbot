@@ -5,7 +5,7 @@
         "updated_at": "2025-02-22"
       },
       "descriptions": {
-        "app_name": "spellbot",
+        "app_name": "scrambot",
         "app_description": "guess game. Type !start to start the game",
         "app_logo": "https://img.icons8.com/?size=100&id=0Jv2lK6NRh0w&format=png&color=000000",
         "app_url": "https://telex-spellbot.onrender.com/api/hangman/",
