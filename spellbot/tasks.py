@@ -12,9 +12,10 @@ def guess_words ():
             if len(word) == 6:
                 return word
 
-#Channel_ID = os.getenv("Channel_ID", "")
+Channel_ID = os.getenv("Channel_ID", "")
+WEBHOOK_URL = f"https://ping.telex.im/v1/webhooks/{Channel_ID}"
 
-WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/01953c1c-d427-726e-b000-204046c9dd14"
+#WEBHOOK_URL = "https://ping.telex.im/v1/webhooks/01953c1c-d427-726e-b000-204046c9dd14"
 
 def send_telex_message(event_name, message, username="Scrambot"):
     """Sends a message back to Telex"""
