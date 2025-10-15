@@ -1,5 +1,5 @@
 ##DESCRIPTION
-This is a hang game build with DRF with the sole aim to unwind
+This is a hang game build with DRF, for telex integration, with the sole aim to unwind
 
 ## Key Features
 1. Acceptance of input from users to start, guess or end the game
