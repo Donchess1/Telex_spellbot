@@ -77,7 +77,7 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://red-cusrcm3qf0us739nvaig:6379",
+        "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -130,7 +130,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'spellbot/static'),
 ]
 
 # Default primary key field type

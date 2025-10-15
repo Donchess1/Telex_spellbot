@@ -1,0 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Django Game</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h1>🎮 Welcome to the Spellbot Guess Game 
+        <b></b>
+    </h1>
+    <a href="{% url 'play' %}" class="button">Start Playing</a>
+</body>
+</html>

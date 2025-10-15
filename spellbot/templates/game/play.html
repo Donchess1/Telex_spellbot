@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hangman Game 🎮</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #4b6cb7, #182848);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      #game-container {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+
+      #word_display {
+        font-size: 1.8rem;
+        letter-spacing: 5px;
+        margin-bottom: 20px;
+      }
+
+      #message {
+        font-size: 1rem;
+        margin: 10px 0;
+        min-height: 20px;
+      }
+
+      input {
+        padding: 10px;
+        width: 80%;
+        font-size: 1rem;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+      }
+
+      button {
+        padding: 10px 15px;
+        font-size: 1rem;
+        margin-top: 10px;
+        cursor: pointer;
+        background-color: #ffcc00;
+        border: none;
+        border-radius: 5px;
+        color: #000;
+        font-weight: bold;
+        transition: background 0.2s ease-in-out;
+      }
+
+      button:hover {
+        background-color: #ffd633;
+      }
+
+      #restart {
+        background-color: #34c759;
+        margin-top: 20px;
+      }
+
+      /* 🔄 Loader Overlay */
+      #loader {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #ffcc00;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hangman Game 🎯</h1>
+    <div id="game-container">
+      <!-- 🔄 Loader -->
+      <div id="loader">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="word_display">_ _ _ _ _</div>
+      <div id="attempts">Attempts left: 6</div>
+      <div id="message"></div>
+
+      <input type="text" id="guess_input" placeholder="Enter a letter..." />
+      <button id="submit_btn">Guess</button>
+
+      <button id="restart" style="display: none">Restart Game</button>
+    </div>
+
+    <script>
+      const wordDisplay = document.getElementById("word_display");
+      const message = document.getElementById("message");
+      const attempts = document.getElementById("attempts");
+      const input = document.getElementById("guess_input");
+      const submitBtn = document.getElementById("submit_btn");
+      const restartBtn = document.getElementById("restart");
+      const loader = document.getElementById("loader");
+
+      // 🔄 Show / Hide Loader
+      function showLoader() {
+        loader.style.display = "flex";
+      }
+      function hideLoader() {
+        loader.style.display = "none";
+      }
+
+      // ✅ Update UI from backend response
+      function updateUI(data) {
+        if (data.new_hidden_word) {
+          wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
+        }
+        if (data.attempts_left !== undefined) {
+          attempts.textContent = `Attempts left: ${data.attempts_left}`;
+        }
+        if (data.message) {
+          message.textContent = data.message;
+        }
+
+        if (data.game_over) {
+          input.disabled = true;
+          submitBtn.disabled = true;
+          restartBtn.style.display = "inline-block";
+        }
+      }
+
+      // ✅ Handle Guess Submission
+      async function sendGuess() {
+        const guess = input.value.trim();
+        if (!guess) return;
+
+        const response = await fetch("/api/hangman/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: guess }),
+        });
+
+        const data = await response.json();
+        updateUI(data);
+        input.value = "";
+      }
+
+      // ✅ Restart Game with Loader
+      async function restartGame() {
+        showLoader();
+        try {
+          const response = await fetch("/api/hangman/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "!start" }),
+          });
+
+          const data = await response.json();
+          updateUI(data);
+
+          input.disabled = false;
+          submitBtn.disabled = false;
+          restartBtn.style.display = "none";
+          input.value = "";
+          message.textContent = "🎮 New game started! Guess a letter!";
+          input.focus();
+        } catch (err) {
+          message.textContent = "⚠️ Error restarting game.";
+        } finally {
+          setTimeout(hideLoader, 500);
+        }
+      }
+
+      // ✅ Load Initial Game with Loader
+      document.addEventListener("DOMContentLoaded", async () => {
+        showLoader();
+        try {
+          const response = await fetch("/api/hangman/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: "!start" }),
+          });
+
+          const data = await response.json();
+          updateUI(data);
+          message.textContent = "🎮 Game loaded! Start guessing!";
+        } catch (err) {
+          message.textContent = "⚠️ Could not load game.";
+        } finally {
+          setTimeout(hideLoader, 800);
+        }
+      });
+
+      submitBtn.addEventListener("click", sendGuess);
+      input.addEventListener("keypress", (e) => e.key === "Enter" && sendGuess());
+      restartBtn.addEventListener("click", restartGame);
+    </script>
+  </body>
+</html>

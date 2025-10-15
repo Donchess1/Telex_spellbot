@@ -1,0 +1,16 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding-top: 60px;
+    background: linear-gradient(to bottom right, #1a73e8, #6dd5fa);
+    color: white;
+}
+
+.button {
+    background: white;
+    color: #1a73e8;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}

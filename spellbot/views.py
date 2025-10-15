@@ -1,61 +1,52 @@
-from bs4 import BeautifulSoup
+# game/views.py
+from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework import status
-from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game 
 from rest_framework.response import Response
-import uuid
+from rest_framework import status
+from bs4 import BeautifulSoup
+from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game
 
+
+# --- Regular Django Views (for rendering HTML) ---
+def home(request):
+    return render(request, "game/home.html")
+
+
+def play(request):
+    """Start game and render play.html"""
+    channel_id = "demo_channel"
+    start_hangman_game(channel_id)
+    return render(request, "game/play.html")
+
+
+# --- DRF API View for handling frontend requests ---
 class HangmanGameView(APIView):
-    def post(self, request):
-        """Processes Hangman game commands and letter guesses."""
-        data = request.data
-        channel_id = "0195397f-d6a4-7a84-ae3e-7c7ec996ec09"
-        messages = data.get("message", "")
-        soup = BeautifulSoup(messages, "html.parser")
-        user_input = soup.get_text().strip().lower()if messages else ""
-        settings = { "start game": "!start",
-                   "end game" :""}
-        if not channel_id:
-            response = {
-                "event_name": "channel_id status",
-                "message": "Missing channel_id",
-                "status": "fail",
-                "username": "spellbot"}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    """Handles POST requests from the JS frontend for gameplay"""
+    channel_id = "demo_channel"
 
-        
-        if user_input == "!start":
-            start_hangman_game(channel_id)
-            response = {
-                "event_name": "game status",
-                "message": user_input,
-                "status": "success",
-                "username": "spellbot"}
-            return Response(response, status=status.HTTP_200_OK)
-        
-        #elif not user_input.isalpha():
-         #   return Response({"error": "only single alphabets are allowed"}, status=status.HTTP_200_OK)
-            
-        elif len(user_input) == 1 and user_input.isalpha():
-            """If a single letter is sent, process it as a guess."""
-            guess_hangman_letter(channel_id, user_input)
-            response = {
-                "event_name": "game status",
-                "message": user_input,
-                "status": "success",
-                "username": "spellbot"}
-            return Response(response, status=status.HTTP_200_OK)
+    def post(self, request):
+        data = request.data
+        message = data.get("message", "")
+
+        # Clean and normalize input
+        user_input = message.lower()
+
+        if not user_input:
+            return Response({"message": "Invalid input"}, status=status.HTTP_400_BAD_REQUEST)
+
         elif user_input == "!exit":
-            end_hangman_game(channel_id)
-            response = {
-                "event_name": "game status",
-                "message": user_input,
-                "status": "success",
-                "username": "spellbot"}
-            return Response(response, status=status.HTTP_200_OK)
+            result = end_hangman_game(self.channel_id)
+            return Response(result, status=status.HTTP_200_OK)
+
+        elif len(user_input) == 1 and user_input.isalpha():
+            result = guess_hangman_letter(self.channel_id, user_input)
+            return Response(result, status=status.HTTP_200_OK)
+
+        elif user_input == "!start":
+            result = start_hangman_game(self.channel_id)
+            return Response(result, status=status.HTTP_200_OK)
+
         return Response(
-            {
-                "even_name": "invalid entry",
-                "message":"Invalid input. Send '!start' to start a game or type a letter to guess.",
-                "status":"fail",
-                "username": "spellbot"}, status=status.HTTP_400_BAD_REQUEST)    
+            {"message": "Invalid command. Use '!start', '!exit', or guess a letter (a-z)."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
