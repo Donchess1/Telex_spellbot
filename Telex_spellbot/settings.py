@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-au&c074gdyquido4(3j6pe-g_q#p3*c(__s9r8^j5^g9s-c4&n'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -67,17 +67,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Telex_spellbot.wsgi.application'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # Cache settings (for storing game state)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://red-cusrcm3qf0us739nvaig:6379",
+        "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
