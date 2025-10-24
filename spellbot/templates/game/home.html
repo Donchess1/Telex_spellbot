@@ -1,14 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Django Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spellbot Guess Game 🎮</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <h1>🎮 Welcome to the Spellbot Guess Game 
-        <b></b>
-    </h1>
-    <a href="{% url 'play' %}" class="button">Start Playing</a>
+<body class="game-body">
+    <div class="overlay">
+        <h1>🎮 Welcome to the <span class="highlight">Spellbot Guess Game</span></h1>
+        <a href="{% url 'play' %}" class="button">Start Playing</a>
+    </div>
 </body>
 </html>
