@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup - Spellbot Game</title>
+  <style>
+    /* Reset and body styling */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      color: white;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Centered container with soft shadow */
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    input:focus {
+      box-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ffcc00;
+      font-weight: bold;
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ffd633;
+    }
+
+    a {
+      color: #ffcc00;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .error-list {
+      color: #ff6666;
+      text-align: left;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🪄 Create Your Spellbot Account</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="password" name="password2" placeholder="Confirm Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
+
+    {% if errors %}
+      <div class="error-list">
+        <ul>
+          {% for field, field_errors in errors.items %}
+            <li><strong>{{ field }}:</strong> {{ field_errors|join:", " }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <p style="margin-top:15px;">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+  </div>
+</body>
+</html>

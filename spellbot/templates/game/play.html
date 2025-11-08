@@ -1,230 +1,222 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hangman Game 🎮</title>
-    <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(to right, #4b6cb7, #182848);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spellbot Hangman 🎮</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      color: #fff;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
 
-      h1 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-      }
+    .game-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 450px;
+      transition: opacity 0.4s ease-in-out;
+    }
 
-      #game-container {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        position: relative;
-      }
+    h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+    .word { font-size: 2rem; letter-spacing: 10px; margin: 20px 0; }
+    .status { margin: 15px 0; font-size: 1.1rem; color: #ffd633; }
 
-      #word_display {
-        font-size: 1.8rem;
-        letter-spacing: 5px;
-        margin-bottom: 20px;
-      }
+    input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      border: none;
+      text-align: center;
+    }
 
-      #message {
-        font-size: 1rem;
-        margin: 10px 0;
-        min-height: 20px;
-      }
+    button {
+      background-color: #ffcc00;
+      color: #000;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+      margin-top: 15px;
+    }
 
-      input {
-        padding: 10px;
-        width: 80%;
-        font-size: 1rem;
-        border-radius: 5px;
-        border: none;
-        outline: none;
-      }
+    button:hover { background-color: #ffd633; }
 
-      button {
-        padding: 10px 15px;
-        font-size: 1rem;
-        margin-top: 10px;
-        cursor: pointer;
-        background-color: #ffcc00;
-        border: none;
-        border-radius: 5px;
-        color: #000;
-        font-weight: bold;
-        transition: background 0.2s ease-in-out;
-      }
+    #playAgainBtn, #quitBtn {
+      display: none;
+      padding: 12px 18px;
+      font-size: 1.1rem;
+      margin: 10px 5px 0 5px;
+    }
 
-      button:hover {
-        background-color: #ffd633;
-      }
+    #playAgainBtn { background-color: #00ff99; }
+    #playAgainBtn:hover { background-color: #33ffaa; }
 
-      #restart {
-        background-color: #34c759;
-        margin-top: 20px;
-      }
+    #quitBtn { background-color: #ff4444; }
+    #quitBtn:hover { background-color: #ff6666; }
 
-      /* 🔄 Loader Overlay */
-      #loader {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        border-radius: 10px;
-      }
+    .logout {
+      display: inline-block;
+      margin-top: 20px;
+      color: #ffcc00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .logout:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="gameContainer">
+    <h1>🎯 Spellbot Hangman</h1>
+    <p>Welcome, <b>{{ username }}</b>!</p>
 
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid #ffcc00;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
+    <div class="word" id="wordDisplay">_ _ _ _ _ _</div>
+    <div class="status" id="attemptsLeft"></div>
+    <div id="gameMessage"></div>
 
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Hangman Game 🎯</h1>
-    <div id="game-container">
-      <!-- 🔄 Loader -->
-      <div id="loader">
-        <div class="spinner"></div>
-      </div>
-
-      <div id="word_display">_ _ _ _ _</div>
-      <div id="attempts">Attempts left: 6</div>
-      <div id="message"></div>
-
-      <input type="text" id="guess_input" placeholder="Enter a letter..." />
-      <button id="submit_btn">Guess</button>
-
-      <button id="restart" style="display: none">Restart Game</button>
+    <div id="inputArea">
+      <input type="text" id="guessInput" maxlength="10" placeholder="Enter letter" autofocus>
+      <button id="sendGuess">Send</button>
     </div>
 
-    <script>
-      const wordDisplay = document.getElementById("word_display");
-      const message = document.getElementById("message");
-      const attempts = document.getElementById("attempts");
-      const input = document.getElementById("guess_input");
-      const submitBtn = document.getElementById("submit_btn");
-      const restartBtn = document.getElementById("restart");
-      const loader = document.getElementById("loader");
+    <div id="result"></div>
 
-      // 🔄 Show / Hide Loader
-      function showLoader() {
-        loader.style.display = "flex";
-      }
-      function hideLoader() {
-        loader.style.display = "none";
-      }
+    <!-- During game, replace logout with quit -->
+    <a href="{% url 'logout' %}" class="logout" id="logoutLink">Logout</a>
 
-      // ✅ Update UI from backend response
-      function updateUI(data) {
-        if (data.new_hidden_word) {
-          wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
-        }
-        if (data.attempts_left !== undefined) {
-          attempts.textContent = `Attempts left: ${data.attempts_left}`;
-        }
-        if (data.message) {
-          message.textContent = data.message;
-        }
+    <!-- Buttons shown after game ends -->
+    <div id="endGameButtons">
+      <button id="playAgainBtn">We Go Again</button>
+      <button id="quitBtn">I Quit</button>
+    </div>
+  </div>
 
-        if (data.game_over) {
-          input.disabled = true;
-          submitBtn.disabled = true;
-          restartBtn.style.display = "inline-block";
-        }
-      }
+  <script>
+    const sendBtn = document.getElementById("sendGuess");
+    const guessInput = document.getElementById("guessInput");
+    const inputArea = document.getElementById("inputArea");
+    const gameMessage = document.getElementById("gameMessage");
+    const wordDisplay = document.getElementById("wordDisplay");
+    const attemptsLeft = document.getElementById("attemptsLeft");
+    const result = document.getElementById("result");
+    const csrftoken = document.querySelector('[name=csrf-token]').content;
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const quitBtn = document.getElementById("quitBtn");
+    const logoutLink = document.getElementById("logoutLink");
 
-      // ✅ Handle Guess Submission
-      async function sendGuess() {
-        const guess = input.value.trim();
-        if (!guess) return;
+    // 🔹 Auto-start game when page loads
+    window.addEventListener("load", async () => {
+      await startGame();
+    });
 
-        const response = await fetch("/api/hangman/", {
+    async function startGame() {
+      // Reset UI
+      wordDisplay.textContent = "_ _ _ _ _ _";
+      attemptsLeft.textContent = "";
+      gameMessage.textContent = "🎮 Starting new game...";
+      result.textContent = "";
+      guessInput.value = "";
+
+      inputArea.style.display = "block";
+      logoutLink.style.display = "none"; // hide logout, show quit
+      playAgainBtn.style.display = "none";
+      quitBtn.style.display = "inline-block";
+
+      try {
+        const response = await fetch("{% url 'hangman_api' %}", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: guess }),
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify({ message: "auto_start" })
         });
 
         const data = await response.json();
-        updateUI(data);
-        input.value = "";
+        if (data.new_hidden_word)
+          wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
+        if (data.attempts_left !== undefined)
+          attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        gameMessage.textContent = data.message || "Make your first guess!";
+      } catch (err) {
+        gameMessage.textContent = "⚠️ Error connecting to server.";
+        console.error(err);
+      }
+    }
+
+    async function sendGuess() {
+      const message = guessInput.value.trim();
+      if (!message) {
+        gameMessage.textContent = "⚠️ Please enter a letter.";
+        return;
       }
 
-      // ✅ Restart Game with Loader
-      async function restartGame() {
-        showLoader();
-        try {
-          const response = await fetch("/api/hangman/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "!start" }),
-          });
+      guessInput.value = "";
+      result.textContent = "";
 
-          const data = await response.json();
-          updateUI(data);
+      try {
+        const response = await fetch("{% url 'hangman_api' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify({ message }),
+        });
 
-          input.disabled = false;
-          submitBtn.disabled = false;
-          restartBtn.style.display = "none";
-          input.value = "";
-          message.textContent = "🎮 New game started! Guess a letter!";
-          input.focus();
-        } catch (err) {
-          message.textContent = "⚠️ Error restarting game.";
-        } finally {
-          setTimeout(hideLoader, 500);
+        const data = await response.json();
+
+        if (data.new_hidden_word)
+          wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
+        if (data.attempts_left !== undefined)
+          attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        if (data.message)
+          gameMessage.textContent = data.message;
+
+        // 🔚 Show buttons when game ends, hide input & quit
+        if (data.game_over) {
+          inputArea.style.display = "none";
+          logoutLink.style.display = "none";
+          playAgainBtn.style.display = "inline-block";
+          quitBtn.style.display = "inline-block";
         }
+      } catch (err) {
+        gameMessage.textContent = "⚠️ Error connecting to server.";
+        console.error(err);
       }
+    }
 
-      // ✅ Load Initial Game with Loader
-      document.addEventListener("DOMContentLoaded", async () => {
-        showLoader();
-        try {
-          const response = await fetch("/api/hangman/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "!start" }),
-          });
+    sendBtn.addEventListener("click", sendGuess);
+    guessInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendGuess();
+      }
+    });
 
-          const data = await response.json();
-          updateUI(data);
-          message.textContent = "🎮 Game loaded! Start guessing!";
-        } catch (err) {
-          message.textContent = "⚠️ Could not load game.";
-        } finally {
-          setTimeout(hideLoader, 800);
-        }
-      });
+    // 🔁 Replay logic
+    playAgainBtn.addEventListener("click", async () => {
+      await startGame();
+    });
 
-      submitBtn.addEventListener("click", sendGuess);
-      input.addEventListener("keypress", (e) => e.key === "Enter" && sendGuess());
-      restartBtn.addEventListener("click", restartGame);
-    </script>
-  </body>
+    // ❌ Quit logic — redirect to login page
+    quitBtn.addEventListener("click", () => {
+      window.location.href = "{% url 'login' %}";
+    });
+  </script>
+</body>
 </html>

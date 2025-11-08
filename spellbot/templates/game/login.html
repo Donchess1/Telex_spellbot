@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Spellbot Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #4b6cb7, #182848);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      width: 320px;
+    }
+    input {
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 90%;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #ffcc00;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background-color: #ffd633; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div style="color: #00ff99;">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if form.errors %}
+      <div style="color: #ff6666; margin-bottom: 10px;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Username" required><br>
+      <input type="password" name="password" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account?
+      <a href="{% url 'signup' %}" style="color:#ffcc00;">Sign up</a>
+    </p>
+  </div>
+</body>
+</html>

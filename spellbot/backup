@@ -1,0 +1,76 @@
+# spellbot/views.py
+from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from django.contrib.auth import login, logout
+from .serializers import SignupSerializer, LoginSerializer
+
+
+# ---- Basic home view ----
+def home(request):
+    return render(request, "game/home.html")
+
+
+# ---- Signup (API endpoint) ----
+class SignupView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = SignupSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = serializer.save()
+        return Response(
+            {"message": f"User '{user.username}' created successfully"},
+            status=status.HTTP_201_CREATED,
+        )
+
+# ---- Login (API endpoint) ----
+class LoginView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = serializer.validated_data["user"]
+        login(request, user)
+        return Response(
+            {"message": f"Welcome {user.username}! Logged in successfully."},
+            status=status.HTTP_200_OK,
+        )
+
+
+# ---- Logout ----
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Logged out successfully."}, status=status.HTTP_200_OK)
+
+
+# ---- Game Views ----
+from rest_framework.decorators import api_view
+from .tasks import start_hangman_game, guess_hangman_letter, end_hangman_game
+
+@api_view(["POST"])
+def hangman_game(request):
+    """Handles gameplay interactions"""
+    channel_id = "demo_channel"
+    message = request.data.get("message", "").strip().lower()
+
+    if not message:
+        return Response({"message": "Invalid input"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if message == "!start":
+        result = start_hangman_game(channel_id)
+    elif message == "!exit":
+        result = end_hangman_game(channel_id)
+    elif len(message) == 1 and message.isalpha():
+        result = guess_hangman_letter(channel_id, message)
+    else:
+        result = {"message": "Invalid command. Use '!start', '!exit', or guess a letter (a-z)."}
+
+    return Response(result, status=status.HTTP_200_OK)

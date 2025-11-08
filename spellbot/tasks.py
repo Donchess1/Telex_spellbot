@@ -11,6 +11,18 @@ def guess_words():
             word = response.json()[0]
             if len(word) == 6:
                 return word
+def hanger(channel_id, letter=None):
+    game_state = cache.get(f"hangman_{channel_id}")
+
+    if not game_state:
+        start_hangman_game(channel_id)
+        if letter:
+            return guess_hangman_letter(channel_id, letter)
+        else:
+            return cache.get(f"hangman_{channel_id}")
+    else:
+        return guess_hangman_letter(channel_id, letter)
+
 
 def start_hangman_game(channel_id):
     """Starts a new Hangman game and stores the game state in the cache."""
@@ -66,15 +78,22 @@ def guess_hangman_letter(channel_id, letter):
             }
     else:
         game_state["attempts_left"] -= 1
+        message = f"❌ Incorrect guess '{letter}'"
         if game_state["attempts_left"] == 0:
             cache.delete(f"hangman_{channel_id}")
             return {
                 "message": f"💀 Game over! The correct word was {game_state['word']}.",
                 "game_over": True
             }
+        else:
+            cache.set(f"hangman_{channel_id}", game_state, timeout=600)
+            return {
+                "message": message,
+                "new_hidden_word": game_state["hidden_word"],
+                "attempts_left": game_state["attempts_left"]
+            }
 
     cache.set(f"hangman_{channel_id}", game_state, timeout=600)
-
     return {
         "message": f"You guessed '{letter}'.",
         "new_hidden_word": game_state["hidden_word"],

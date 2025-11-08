@@ -6,11 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spellbot Guess Game 🎮</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body.game-body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .overlay {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+        .highlight { color: #ffcc00; }
+        .button {
+            background-color: #ffcc00;
+            color: #000;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s ease-in-out;
+        }
+        .button:hover { background-color: #ffd633; }
+    </style>
 </head>
 <body class="game-body">
     <div class="overlay">
         <h1>🎮 Welcome to the <span class="highlight">Spellbot Guess Game</span></h1>
-        <a href="{% url 'play' %}" class="button">Start Playing</a>
+        <p>Login to start playing and track your scores!</p>
+        <a href="{% url 'login' %}" class="button">Login</a>
+        <a href="{% url 'signup' %}" class="button" style="margin-left:10px;">Sign Up</a>
     </div>
 </body>
 </html>
