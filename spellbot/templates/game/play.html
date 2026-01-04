@@ -40,9 +40,7 @@
       border-radius: 8px;
       border: none;
       text-align: center;
-    }
-
-    button {
+    }    button {
       background-color: #ffcc00;
       color: #000;
       padding: 10px 15px;
@@ -55,6 +53,20 @@
     }
 
     button:hover { background-color: #ffd633; }
+    
+    button:disabled {
+      background-color: #666;
+      color: #999;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    input:disabled {
+      background-color: #666;
+      color: #999;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
 
     #playAgainBtn, #quitBtn {
       display: none;
@@ -67,9 +79,7 @@
     #playAgainBtn:hover { background-color: #33ffaa; }
 
     #quitBtn { background-color: #ff4444; }
-    #quitBtn:hover { background-color: #ff6666; }
-
-    .logout {
+    #quitBtn:hover { background-color: #ff6666; }    .logout {
       display: inline-block;
       margin-top: 20px;
       color: #ffcc00;
@@ -77,12 +87,78 @@
       font-weight: bold;
     }
     .logout:hover { text-decoration: underline; }
+
+    /* Score Meter Styles */
+    .score-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: 1.1rem;
+      color: #ffd633;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .score-meter {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin: 10px 0;
+    }
+
+    .score-bar {
+      width: 20px;
+      height: 25px;
+      background-color: #333;
+      border: 2px solid #555;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .score-bar.filled {
+      background-color: #00ff99;
+      border-color: #00cc77;
+      box-shadow: 0 0 8px #00ff99;
+    }
+
+    .score-bar.high {
+      background-color: #00ff99;
+      border-color: #00cc77;
+    }
+
+    .score-bar.medium {
+      background-color: #ffcc00;
+      border-color: #cc9900;
+    }
+
+    .score-bar.low {
+      background-color: #ff4444;
+      border-color: #cc3333;
+    }
   </style>
 </head>
-<body>
-  <div class="game-container" id="gameContainer">
+<body>  <div class="game-container" id="gameContainer">
     <h1>🎯 Spellbot Hangman</h1>
     <p>Welcome, <b>{{ username }}</b>!</p>
+
+    <!-- Score Meter -->
+    <div class="score-container">
+      <div class="score-label">Skill Level: <span id="scoreText">5/10</span></div>
+      <div class="score-meter" id="scoreMeter">
+        <div class="score-bar" data-index="0"></div>
+        <div class="score-bar" data-index="1"></div>
+        <div class="score-bar" data-index="2"></div>
+        <div class="score-bar" data-index="3"></div>
+        <div class="score-bar" data-index="4"></div>
+        <div class="score-bar" data-index="5"></div>
+        <div class="score-bar" data-index="6"></div>
+        <div class="score-bar" data-index="7"></div>
+        <div class="score-bar" data-index="8"></div>
+        <div class="score-bar" data-index="9"></div>
+      </div>
+    </div>
 
     <div class="word" id="wordDisplay">_ _ _ _ _ _</div>
     <div class="status" id="attemptsLeft"></div>
@@ -112,24 +188,47 @@
     const gameMessage = document.getElementById("gameMessage");
     const wordDisplay = document.getElementById("wordDisplay");
     const attemptsLeft = document.getElementById("attemptsLeft");
-    const result = document.getElementById("result");
-    const csrftoken = document.querySelector('[name=csrf-token]').content;
+    const result = document.getElementById("result");    const csrftoken = document.querySelector('[name=csrf-token]').content;
     const playAgainBtn = document.getElementById("playAgainBtn");
     const quitBtn = document.getElementById("quitBtn");
     const logoutLink = document.getElementById("logoutLink");
+    const scoreText = document.getElementById("scoreText");
+    const scoreMeter = document.getElementById("scoreMeter");
+
+    // Function to update score meter display
+    function updateScoreMeter(score) {
+      scoreText.textContent = `${score}/10`;
+      const bars = scoreMeter.querySelectorAll('.score-bar');
+      
+      bars.forEach((bar, index) => {
+        bar.classList.remove('filled', 'high', 'medium', 'low');
+        if (index < score) {
+          bar.classList.add('filled');
+          if (score >= 8) {
+            bar.classList.add('high');
+          } else if (score >= 4) {
+            bar.classList.add('medium');
+          } else {
+            bar.classList.add('low');
+          }
+        }
+      });
+    }
 
     // 🔹 Auto-start game when page loads
     window.addEventListener("load", async () => {
       await startGame();
-    });
-
-    async function startGame() {
-      // Reset UI
+    });    async function startGame() {
+      // Reset UI and show loading state
       wordDisplay.textContent = "_ _ _ _ _ _";
       attemptsLeft.textContent = "";
-      gameMessage.textContent = "🎮 Starting new game...";
+      gameMessage.textContent = "🎮 Loading new word... ⏳";
       result.textContent = "";
       guessInput.value = "";
+      
+      // Disable input during loading
+      sendBtn.disabled = true;
+      guessInput.disabled = true;
 
       inputArea.style.display = "block";
       logoutLink.style.display = "none"; // hide logout, show quit
@@ -146,24 +245,37 @@
           body: JSON.stringify({ message: "auto_start" })
         });
 
-        const data = await response.json();
-        if (data.new_hidden_word)
+        const data = await response.json();        if (data.new_hidden_word)
           wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
         if (data.attempts_left !== undefined)
           attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        if (data.current_score !== undefined)
+          updateScoreMeter(data.current_score);
         gameMessage.textContent = data.message || "Make your first guess!";
+        
+        // Re-enable input after loading
+        sendBtn.disabled = false;
+        guessInput.disabled = false;
+        guessInput.focus(); // Focus on input for immediate play
       } catch (err) {
         gameMessage.textContent = "⚠️ Error connecting to server.";
         console.error(err);
+        // Re-enable input even on error
+        sendBtn.disabled = false;
+        guessInput.disabled = false;
       }
-    }
-
-    async function sendGuess() {
+    }    async function sendGuess() {
       const message = guessInput.value.trim();
       if (!message) {
         gameMessage.textContent = "⚠️ Please enter a letter.";
         return;
       }
+
+      // Show processing state
+      const originalMessage = gameMessage.textContent;
+      gameMessage.textContent = "🤔 Checking your guess...";
+      sendBtn.disabled = true;
+      guessInput.disabled = true;
 
       guessInput.value = "";
       result.textContent = "";
@@ -178,12 +290,12 @@
           body: JSON.stringify({ message }),
         });
 
-        const data = await response.json();
-
-        if (data.new_hidden_word)
+        const data = await response.json();        if (data.new_hidden_word)
           wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
         if (data.attempts_left !== undefined)
           attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        if (data.current_score !== undefined)
+          updateScoreMeter(data.current_score);
         if (data.message)
           gameMessage.textContent = data.message;
 
@@ -193,10 +305,18 @@
           logoutLink.style.display = "none";
           playAgainBtn.style.display = "inline-block";
           quitBtn.style.display = "inline-block";
+        } else {
+          // Re-enable input for next guess
+          sendBtn.disabled = false;
+          guessInput.disabled = false;
+          guessInput.focus();
         }
       } catch (err) {
         gameMessage.textContent = "⚠️ Error connecting to server.";
         console.error(err);
+        // Re-enable input on error
+        sendBtn.disabled = false;
+        guessInput.disabled = false;
       }
     }
 
