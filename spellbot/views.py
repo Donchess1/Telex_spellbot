@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import SignupSerializer, LoginSerializer
-from .tasks import start_hangman_game, hanger, end_hangman_game
+from .tasks import start_hangman_game, hanger, end_hangman_game, get_or_continue_game
 from django.urls import reverse_lazy
 
 def home(request):
@@ -59,7 +59,12 @@ class HangmanGameView(APIView):
             return Response({"message": "Invalid input"}, status=status.HTTP_400_BAD_REQUEST)
 
         if user_input == "auto_start":
-            # Handle automatic game start from frontend
+            # Handle automatic game start/continue from frontend (browser reload)
+            result = get_or_continue_game(self.channel_id, request.user)
+            return Response(result, status=status.HTTP_200_OK)
+
+        elif user_input == "force_new_game":
+            # Force start a completely new game (for "We Go Again" button)
             result = start_hangman_game(self.channel_id, request.user)
             return Response(result, status=status.HTTP_200_OK)
 

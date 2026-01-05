@@ -17,9 +17,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-    }
-
-    .game-container {
+    }    .game-container {
       background: rgba(255, 255, 255, 0.1);
       padding: 40px 30px;
       border-radius: 12px;
@@ -27,6 +25,7 @@
       width: 90%;
       max-width: 450px;
       transition: opacity 0.4s ease-in-out;
+      position: relative;
     }
 
     h1 { font-size: 1.8rem; margin-bottom: 1rem; }
@@ -131,37 +130,102 @@
     .score-bar.medium {
       background-color: #ffcc00;
       border-color: #cc9900;
-    }
-
-    .score-bar.low {
+    }    .score-bar.low {
       background-color: #ff4444;
       border-color: #cc3333;
+    }
+
+    /* Lives and Wins Indicators */
+    .lives-container {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      text-align: center;
+    }
+
+    .wins-container {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      text-align: center;
+    }
+
+    .indicator-label {
+      font-size: 0.9rem;
+      color: #ffd633;
+      margin-bottom: 5px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .indicator-balls {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .indicator-ball {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #00ff99;
+      border: 1px solid #00cc77;
+      box-shadow: 0 0 6px #00ff99;
+      transition: all 0.3s ease;
+    }
+
+    .indicator-ball.dimmed {
+      background-color: #333;
+      border-color: #555;
+      box-shadow: none;
+      opacity: 0.4;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 480px) {
+      .lives-container, .wins-container {
+        position: static;
+        margin: 10px 0;
+      }
+      
+      .game-container {
+        padding: 30px 20px;
+      }
     }
   </style>
 </head>
 <body>  <div class="game-container" id="gameContainer">
-    <h1>🎯 Spellbot Hangman</h1>
+    <!-- Lives indicator (upper right) -->
+    <div class="lives-container">
+      <div class="indicator-label">Lives</div>
+      <div class="indicator-balls" id="livesDisplay">
+        <div class="indicator-ball" data-life="0"></div>
+        <div class="indicator-ball" data-life="1"></div>
+        <div class="indicator-ball" data-life="2"></div>
+        <div class="indicator-ball" data-life="3"></div>
+        <div class="indicator-ball" data-life="4"></div>
+        <div class="indicator-ball" data-life="5"></div>
+      </div>
+    </div>    <!-- Skill Level indicator (upper left) -->
+    <div class="wins-container">
+      <div class="indicator-label">Skill</div>
+      <div class="indicator-balls" id="skillDisplay">
+        <div class="indicator-ball" data-skill="0"></div>
+        <div class="indicator-ball" data-skill="1"></div>
+        <div class="indicator-ball" data-skill="2"></div>
+        <div class="indicator-ball" data-skill="3"></div>
+        <div class="indicator-ball" data-skill="4"></div>
+        <div class="indicator-ball" data-skill="5"></div>
+        <div class="indicator-ball" data-skill="6"></div>
+        <div class="indicator-ball" data-skill="7"></div>
+        <div class="indicator-ball" data-skill="8"></div>
+        <div class="indicator-ball" data-skill="9"></div>
+      </div>
+    </div>    <h1>🎯 Spellbot Hangman</h1>
     <p>Welcome, <b>{{ username }}</b>!</p>
 
-    <!-- Score Meter -->
-    <div class="score-container">
-      <div class="score-label">Skill Level: <span id="scoreText">5/10</span></div>
-      <div class="score-meter" id="scoreMeter">
-        <div class="score-bar" data-index="0"></div>
-        <div class="score-bar" data-index="1"></div>
-        <div class="score-bar" data-index="2"></div>
-        <div class="score-bar" data-index="3"></div>
-        <div class="score-bar" data-index="4"></div>
-        <div class="score-bar" data-index="5"></div>
-        <div class="score-bar" data-index="6"></div>
-        <div class="score-bar" data-index="7"></div>
-        <div class="score-bar" data-index="8"></div>
-        <div class="score-bar" data-index="9"></div>
-      </div>
-    </div>
-
     <div class="word" id="wordDisplay">_ _ _ _ _ _</div>
-    <div class="status" id="attemptsLeft"></div>
     <div id="gameMessage"></div>
 
     <div id="inputArea">
@@ -181,36 +245,52 @@
     </div>
   </div>
 
-  <script>
-    const sendBtn = document.getElementById("sendGuess");
+  <script>    const sendBtn = document.getElementById("sendGuess");
     const guessInput = document.getElementById("guessInput");
     const inputArea = document.getElementById("inputArea");
     const gameMessage = document.getElementById("gameMessage");
     const wordDisplay = document.getElementById("wordDisplay");
-    const attemptsLeft = document.getElementById("attemptsLeft");
-    const result = document.getElementById("result");    const csrftoken = document.querySelector('[name=csrf-token]').content;
+    const result = document.getElementById("result");const csrftoken = document.querySelector('[name=csrf-token]').content;
     const playAgainBtn = document.getElementById("playAgainBtn");
     const quitBtn = document.getElementById("quitBtn");
     const logoutLink = document.getElementById("logoutLink");
-    const scoreText = document.getElementById("scoreText");
-    const scoreMeter = document.getElementById("scoreMeter");
+    const livesDisplay = document.getElementById("livesDisplay");
+    const skillDisplay = document.getElementById("skillDisplay");
 
-    // Function to update score meter display
-    function updateScoreMeter(score) {
-      scoreText.textContent = `${score}/10`;
-      const bars = scoreMeter.querySelectorAll('.score-bar');
-      
-      bars.forEach((bar, index) => {
-        bar.classList.remove('filled', 'high', 'medium', 'low');
-        if (index < score) {
-          bar.classList.add('filled');
-          if (score >= 8) {
-            bar.classList.add('high');
-          } else if (score >= 4) {
-            bar.classList.add('medium');
+    // Function to update lives display
+    function updateLivesDisplay(livesLeft) {
+      const lifeBalls = livesDisplay.querySelectorAll('.indicator-ball');
+      lifeBalls.forEach((ball, index) => {
+        if (index < livesLeft) {
+          ball.classList.remove('dimmed');
+        } else {
+          ball.classList.add('dimmed');
+        }
+      });
+    }
+
+    // Function to update skill display with color coding
+    function updateSkillDisplay(skillLevel) {
+      const skillBalls = skillDisplay.querySelectorAll('.indicator-ball');
+      skillBalls.forEach((ball, index) => {
+        if (index < skillLevel) {
+          ball.classList.remove('dimmed');
+          // Add color coding based on skill level
+          if (skillLevel >= 8) {
+            ball.style.backgroundColor = '#00ff99';
+            ball.style.borderColor = '#00cc77';
+            ball.style.boxShadow = '0 0 6px #00ff99';
+          } else if (skillLevel >= 4) {
+            ball.style.backgroundColor = '#ffcc00';
+            ball.style.borderColor = '#cc9900';
+            ball.style.boxShadow = '0 0 6px #ffcc00';
           } else {
-            bar.classList.add('low');
+            ball.style.backgroundColor = '#ff4444';
+            ball.style.borderColor = '#cc3333';
+            ball.style.boxShadow = '0 0 6px #ff4444';
           }
+        } else {
+          ball.classList.add('dimmed');
         }
       });
     }
@@ -221,7 +301,6 @@
     });    async function startGame() {
       // Reset UI and show loading state
       wordDisplay.textContent = "_ _ _ _ _ _";
-      attemptsLeft.textContent = "";
       gameMessage.textContent = "🎮 Loading new word... ⏳";
       result.textContent = "";
       guessInput.value = "";
@@ -247,10 +326,11 @@
 
         const data = await response.json();        if (data.new_hidden_word)
           wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
-        if (data.attempts_left !== undefined)
-          attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        if (data.attempts_left !== undefined) {
+          updateLivesDisplay(data.attempts_left);
+        }
         if (data.current_score !== undefined)
-          updateScoreMeter(data.current_score);
+          updateSkillDisplay(data.current_score);
         gameMessage.textContent = data.message || "Make your first guess!";
         
         // Re-enable input after loading
@@ -292,10 +372,11 @@
 
         const data = await response.json();        if (data.new_hidden_word)
           wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
-        if (data.attempts_left !== undefined)
-          attemptsLeft.textContent = `Chances left: ${data.attempts_left}`;
+        if (data.attempts_left !== undefined) {
+          updateLivesDisplay(data.attempts_left);
+        }
         if (data.current_score !== undefined)
-          updateScoreMeter(data.current_score);
+          updateSkillDisplay(data.current_score);
         if (data.message)
           gameMessage.textContent = data.message;
 
@@ -326,11 +407,44 @@
         e.preventDefault();
         sendGuess();
       }
-    });
-
-    // 🔁 Replay logic
+    });    // 🔁 Replay logic - Force start a new game
     playAgainBtn.addEventListener("click", async () => {
-      await startGame();
+      try {
+        const response = await fetch("{% url 'hangman_api' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+          },
+          body: JSON.stringify({ message: "force_new_game" })
+        });
+
+        const data = await response.json();
+        
+        if (data.new_hidden_word)
+          wordDisplay.textContent = data.new_hidden_word.split("").join(" ");
+        if (data.attempts_left !== undefined) {
+          updateLivesDisplay(data.attempts_left);
+        }
+        if (data.current_score !== undefined)
+          updateSkillDisplay(data.current_score);
+        gameMessage.textContent = data.message || "New game started!";
+        
+        // Reset game UI
+        inputArea.style.display = "block";
+        logoutLink.style.display = "none";
+        playAgainBtn.style.display = "none";
+        quitBtn.style.display = "inline-block";
+        result.textContent = "";
+        
+        // Enable input
+        sendBtn.disabled = false;
+        guessInput.disabled = false;
+        guessInput.focus();
+      } catch (err) {
+        gameMessage.textContent = "⚠️ Error starting new game.";
+        console.error(err);
+      }
     });
 
     // ❌ Quit logic — redirect to login page

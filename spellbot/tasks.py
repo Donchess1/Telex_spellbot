@@ -86,6 +86,22 @@ def start_hangman_game(channel_id, user=None):
         "current_score": current_score
     }
 
+def get_or_continue_game(channel_id, user=None):
+    """Gets existing game state or starts a new one if no game exists."""
+    existing_game = cache.get(f"hangman_{channel_id}")
+    
+    if existing_game:
+        # Game exists, return current state
+        return {
+            "message": "🎮 Continuing existing game...",
+            "new_hidden_word": existing_game["hidden_word"],
+            "attempts_left": existing_game["attempts_left"],
+            "current_score": existing_game["current_score"]
+        }
+    else:
+        # No existing game, start a new one
+        return start_hangman_game(channel_id, user)
+
 def end_hangman_game(channel_id):
     """Ends the current Hangman game."""
     cache.delete(f"hangman_{channel_id}")
@@ -147,7 +163,8 @@ def guess_hangman_letter(channel_id, letter):
                 "message": f"🎉 You guessed the word correctly: {game_state['word']}! You win! 🎊",
                 "new_hidden_word": new_hidden_word,
                 "game_over": True,
-                "current_score": final_score
+                "current_score": final_score,
+                "attempts_left": 0  # No lives left to show
             }
         else:
             # Correct letter but word not complete yet - NO score change
@@ -170,7 +187,8 @@ def guess_hangman_letter(channel_id, letter):
             return {
                 "message": f"💀 Game over! The correct word was {game_state['word']}.",
                 "game_over": True,
-                "current_score": final_score
+                "current_score": final_score,
+                "attempts_left": 0  # No lives left to show
             }
         else:
             # Still have attempts left - NO score change
